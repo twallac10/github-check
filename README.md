@@ -14,3 +14,15 @@ Python 3.8+, standard library only.
 ```
 
 Run `./github_check.py --help` for all options.
+
+## cf_colo.py
+Tracks which Cloudflare colo (data centre) your traffic lands in. Each round it resolves Cloudflare-proxied hostnames (default `www.cloudflare.com`, `one.one.one.one`), connects to every edge IP over TLS, reads `/cdn-cgi/trace` (`colo=`, `loc=`, your public `ip=`, `http=`, `tls=`, `warp=`), cross-checks the `CF-RAY` header, and flags when the colo for a host/IP changes. Ctrl-C prints a summary of colo sightings. It imports the DNS code from `github_check.py`, so keep the two files together.
+
+```
+./cf_colo.py                                       # loop forever, one round per 60s
+./cf_colo.py --once
+./cf_colo.py --csv colo.csv --quiet                # --quiet: only failures and colo changes
+./cf_colo.py --pin www.cloudflare.com=104.16.124.96  # test a specific edge IP, skipping DNS
+```
+
+It shows where your traffic enters Cloudflare, not the path onward. Run it from different networks or VPNs to see different colos.
